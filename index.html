@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <div>
+        <h1>LIBRARY NAKO</h1>
+    </div>
+    <div>
+        <div><button onclick="displayForm()">ADD BOOK</button></div>
+        <div style="display: none;" class="cont">
+            <div>
+                <form id="form">
+                    <input id="title" name="title" type="text" placeholder="title">
+                    <input type="text" id="author" name="author" placeholder="Author">
+                    <input type="number" id="pages" name="pages" placeholder="Pages">
+                    <label for="read">Nabasa naba nimo ni?</label>
+                    <select name="read" id="read">
+                        <option value="1">YES</option>
+                        <option value="0">NO</option>
+                    </select>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+        <div  class="booksCont">
+            
+        </div>
+    </div>
+    <div class="footer">
+        AKOY GAGAMA ANI
+    </div>
+
+
+
+
+    <script>
+        let form = document.querySelector("#form");
+        let title = document.querySelector("#title");
+        let author = document.querySelector("#author");
+        let pages = document.querySelector("#pages");
+        let read = document.querySelector("#read");
+        let cont = document.querySelector(".cont");
+        let booksCont = document.querySelector(".booksCont");
+       
+       
+       
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if(title.value && author.value && pages.value && read.value){
+                submitBook(title.value, author.value, pages.value, read.value);
+            }else{
+                alert("Some VALUES ARE MISSING");
+            }
+        })
+
+        //CREATE A BOOK CONSTRUCTOR
+        function Book(title,author,pages,read) {
+            this.title = title;
+            this.author = author;
+            this.pages = pages;
+            this.read = read;
+        }
+
+        //ARRAY THAT STORES BOOKS;
+        let books = [];
+
+        //SUBMIT THE BOOK LOGIC;
+        function submitBook(title, author, pages, read) {
+            let book = new Book(title, author, pages, read);
+            books.unshift(book);
+            console.log(books);
+            displayBooks();
+            localStorage.setItem('libraryBooks', JSON.stringify(books)); 
+        }
+
+
+        //DISPLAY FORM
+        function displayForm() {
+            if(cont.style.display != 'flex'){
+                cont.style.display = 'flex'
+            }else{
+                cont.style.display = 'none'
+            }
+        }
+
+        //DISPLAY BOOKS
+        function  displayBooks(){
+            booksCont.innerHTML = "";
+            books.forEach((e, indx) => { 
+                booksCont.innerHTML += `
+                <div style="border: 2px solid red;">
+                    <h4>Title: ${e.title}</h4>
+                    <h4>Author: ${e.author}</h4>
+                    <h4>Pages: ${e.pages}</h4>
+                    <h4>Read: ${Number(e.read) === 1 ? 'YES' : 'NO'}</h4>
+                    <button onclick="readStatus(${indx})" style="background-color: ${e.read == 1 ? 'green' : 'red'}">READ</button><br>
+                    <button onclick="deleteBook(${indx})">Remove</button>
+                </div>
+                `
+            });
+        }
+
+        displayBooks();
+
+        //DELETE BOOKS
+        function deleteBook(indx) {
+            let newBooks = [];
+            for (let index = 0; index < books.length; index++) {
+                if (index !== indx) {
+                    newBooks.push(books[index]);
+                }else{
+                    continue;
+                }
+            }
+            books = newBooks;
+            displayBooks();
+            localStorage.setItem('libraryBooks', JSON.stringify(books)); 
+
+        }
+
+        //UPDATE READ STATUS
+        function readStatus(indx) {
+            let newBook = [];
+            for(let i = 0; i < books.length; i++){
+                if (i === Number(indx)) {
+                    books[i].read = books[i].read == 1 ? '0' : '1';
+                }
+            }
+
+            displayBooks();
+            localStorage.setItem('libraryBooks', JSON.stringify(books)); 
+
+        }
+
+        let storedBooks = localStorage.getItem("libraryBooks");
+        if(storedBooks){
+            books = JSON.parse(storedBooks);
+            console.log(books);
+            displayBooks();
+        }else{
+            displayBooks()
+        }
+    </script>
+</body>
+</html>
